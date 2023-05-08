@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "388765248192",
+    "project_id": "stimik-1116a",
+    "storage_bucket": "stimik-1116a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:388765248192:android:d0d3c0c542b2c006915b25",
+        "android_client_info": {
+          "package_name": "com.example.newapps"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "388765248192-u84ggbadj3jvlbkmbl5fa465bvp5jh54.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6sK0jRWUUuPApqQkilWVHzNVrT-6BOBs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "388765248192-u84ggbadj3jvlbkmbl5fa465bvp5jh54.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "388765248192-orr2cjqo6p70hj0pqe9th9ui8njejb4f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.newapps"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
