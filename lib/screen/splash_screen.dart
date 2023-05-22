@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:newapps/login_screen.dart';
+import 'package:newapps/screen/login_screen.dart';
+
+import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -41,14 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
           const SizedBox(height: 72),
           ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LoginScreen(),
-                ),
-              );
-            },
+            onPressed: () => _checkAuth(),
             style: ButtonStyle(
               backgroundColor: const MaterialStatePropertyAll(Colors.white),
               foregroundColor: const MaterialStatePropertyAll(Colors.pink),
@@ -64,5 +60,24 @@ class _SplashScreenState extends State<SplashScreen> {
         ]),
       ),
     );
+  }
+
+  _checkAuth() {
+    final auth = FirebaseAuth.instance.currentUser;
+    if (auth == null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(),
+        ),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
+        ),
+      );
+    }
   }
 }

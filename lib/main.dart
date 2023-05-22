@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:newapps/app_constant.dart';
-import 'package:newapps/splash_screen.dart';
+import 'package:newapps/utils/app_constant.dart';
+import 'package:newapps/screen/splash_screen.dart';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -9,10 +9,11 @@ main() async {
   await Firebase.initializeApp(
     name: AppConstant.firebaseName,
     options: const FirebaseOptions(
-        apiKey: AppConstant.firebaseApiKey,
-        appId: AppConstant.firebaseAppId,
-        messagingSenderId: "388765248192",
-        projectId: "stimik-1116a"),
+      apiKey: AppConstant.firebaseApiKey,
+      appId: AppConstant.firebaseAppId,
+      messagingSenderId: AppConstant.messagingSenderId,
+      projectId: AppConstant.projectId,
+    ),
   );
 
   runApp(const MyApp());
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: AppConstant.titleApp,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
