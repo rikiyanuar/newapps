@@ -1,17 +1,20 @@
+// ignore_for_file: avoid_print, use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:newapps/screen/home_screen.dart';
+import 'package:newapps/screen/register_screen.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final _emailInput = TextEditingController();
   final _passwordInput = TextEditingController();
-  final _passwordConfirmationInput = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         offset: Offset(0, 4),
                       )
                     ]),
-                margin: const EdgeInsets.only(top: 16),
+                margin: const EdgeInsets.only(top: 16, bottom: 32),
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
@@ -98,44 +101,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           hintText: "Password",
                           border: InputBorder.none,
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(25),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black26,
-                        offset: Offset(0, 4),
-                      )
-                    ]),
-                margin: const EdgeInsets.only(top: 16, bottom: 32),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.key,
-                      color: Colors.pink,
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _passwordConfirmationInput,
-                        decoration: const InputDecoration(
-                          hintText: "Confirmation Password",
-                          border: InputBorder.none,
-                        ),
+                        obscureText: true,
                       ),
                     ),
                   ],
                 ),
               ),
               ElevatedButton(
-                onPressed: () => _register(),
+                onPressed: () => _login(),
                 style: ButtonStyle(
                   backgroundColor: const MaterialStatePropertyAll(Colors.white),
                   foregroundColor: const MaterialStatePropertyAll(Colors.pink),
@@ -146,7 +119,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
-                child: const Text("REGISTER"),
+                child: const Text("LOGIN"),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                "If you don't have Account",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RegisterScreen(),
+                    ),
+                  );
+                },
+                child: Text(
+                  "Sign Up",
+                  style: TextStyle(
+                    color: Colors.pink.shade900,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
@@ -155,28 +153,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  _register() async {
-    if (_passwordInput.text == _passwordConfirmationInput.text) {
-      try {
-        final credential =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailInput.text,
-          password: _passwordInput.text,
-        );
-        print(credential.user!.email);
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          print('The password provided is too weak.');
-        } else if (e.code == 'email-already-in-use') {
-          print('The account already exists for that email.');
-        }
-      } catch (e) {
-        print(e);
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Password tidak sama")),
+  _login() async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailInput.text,
+        password: _passwordInput.text,
       );
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
+        ),
+        (route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
     }
   }
 }
