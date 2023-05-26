@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:newapps/splash_screen.dart';
+import 'package:newapps/screen/splash_screen.dart';
 
-import 'app_constant.dart';
+import 'utils/app_constant.dart';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,8 +12,8 @@ main() async {
     options: const FirebaseOptions(
       apiKey: AppConstant.firebaseApiKey,
       appId: AppConstant.firebaseAppId,
-      messagingSenderId: "388765248192",
-      projectId: "stimik-1116a",
+      messagingSenderId: AppConstant.messagingSenderId,
+      projectId: AppConstant.projectId,
     ),
   );
 

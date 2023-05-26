@@ -1,5 +1,9 @@
+// ignore_for_file: avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import 'home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -125,12 +129,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
   register() async {
     if (_passwordInput.text == _passwordConfirmInput.text) {
       try {
-        final credential =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailInput.text,
           password: _passwordInput.text,
         );
-        print(credential.user!);
+        Future.delayed(const Duration(seconds: 3)).then(
+          (value) => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          ),
+        );
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           print('No user found for that email.');
