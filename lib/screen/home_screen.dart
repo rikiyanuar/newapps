@@ -5,7 +5,11 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:newapps/screen/splash_screen.dart';
+
+import '../widgets/button.dart';
+import 'presensi_screen.dart';
+import 'riwayat_presensi_screen.dart';
+import 'splash_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,14 +18,31 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+class Menu {
+  final IconData icon;
+  final String title;
+
+  Menu(this.icon, this.title);
+}
+
 class _HomeScreenState extends State<HomeScreen> {
-  String _time = "";
   String _email = "";
+  String _time = "";
+  final menuList = [
+    Menu(Icons.newspaper_outlined, "Berita"),
+    Menu(Icons.monetization_on_rounded, "Gaji"),
+    Menu(Icons.people, "Monitoring"),
+    Menu(Icons.track_changes, "Nilai"),
+    Menu(Icons.timer_sharp, "Presensi"),
+    Menu(Icons.bar_chart_outlined, "Statistik"),
+    Menu(Icons.person, "Profil"),
+    Menu(Icons.calendar_month, "Cuti"),
+  ];
 
   @override
   void initState() {
+    _getEmail();
     _setTime();
-    _getData();
     Timer.periodic(const Duration(seconds: 1), (timer) => _setTime());
     super.initState();
   }
@@ -31,23 +52,39 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Stack(children: [
         Container(
-          color: Colors.purple,
-          height: 180,
+          color: Colors.pink,
+          height: 250,
           width: double.infinity,
         ),
         Column(children: [
-          SizedBox(height: MediaQuery.of(context).padding.top + 16),
+          SizedBox(height: MediaQuery.of(context).padding.top + 12),
           _buildNameWidget(),
           _buildCardWidget(),
-          const SizedBox(height: 20),
-          _buildGridView(),
-          const SizedBox(height: 30),
-          const Text(
-            "Menara Standard Chartered",
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              decoration: TextDecoration.underline,
-              fontSize: 18,
+          MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: GridView.count(
+              crossAxisCount: 4,
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
+              children: menuList
+                  .map((menu) => _buildMenuWidget(menu.icon, menu.title))
+                  .toList(),
+            ),
+          ),
+          const Spacer(),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: GeneralButton(
+              text: "ABSEN MASUK",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PresensiScreen(mode: "Masuk"),
+                  ),
+                );
+              },
             ),
           ),
         ])
@@ -55,93 +92,111 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  GridView _buildGridView() {
-    return GridView.count(
-      shrinkWrap: true,
-      crossAxisCount: 4,
-      childAspectRatio: 1.2,
-      children: [
-        _buildMenuWidget(
-          icon: Icons.newspaper_outlined,
-          title: "Berita",
-        ),
-        _buildMenuWidget(
-          icon: Icons.monetization_on_rounded,
-          title: "Gaji",
-        ),
-        _buildMenuWidget(
-          icon: Icons.people,
-          title: "Monitoring",
-        ),
-        _buildMenuWidget(
-          icon: Icons.track_changes,
-          title: "Nilai",
-        ),
-        _buildMenuWidget(
-          icon: Icons.note_add_sharp,
-          title: "Presensi",
-        ),
-        _buildMenuWidget(
-          icon: Icons.bar_chart_outlined,
-          title: "Statistik",
-        ),
-        _buildMenuWidget(
-          icon: Icons.person,
-          title: "Profil",
-        ),
-        _buildMenuWidget(
-          icon: Icons.calendar_month,
-          title: "Cuti",
-        ),
-      ],
-    );
-  }
-
-  _buildMenuWidget({
-    required IconData icon,
-    required String title,
-  }) {
-    return Column(children: [
-      CircleAvatar(child: Icon(icon)),
-      const SizedBox(height: 6),
-      Text(title, style: const TextStyle(fontSize: 16)),
-    ]);
-  }
-
-  Container _buildCardWidget() {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            spreadRadius: 4,
-          )
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+  Widget _buildMenuWidget(
+    IconData icon,
+    String title,
+  ) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        if (title == "Presensi") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RiwayatPresensiScreen(),
+            ),
+          );
+        }
+      },
       child: Column(children: [
-        Text(_format("EEEE, dd MMM yyyy")),
-        const SizedBox(height: 12),
-        Text(
-          _time,
-          style: const TextStyle(
-            fontSize: 60,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Icon(icon, size: 34, color: Colors.blue),
+        const SizedBox(height: 10),
+        Text(title),
       ]),
     );
   }
 
-  _format(String pattern) {
-    final dateTime = DateTime.now();
+  Container _buildCardWidget() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 14,
+            spreadRadius: 4,
+          )
+        ],
+      ),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+      child: Column(children: [
+        Text(_format("EEEE, dd MMM yyyy")),
+        const SizedBox(height: 8),
+        Text(
+          _time,
+          style: const TextStyle(
+            fontSize: 48,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 2,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  "Absen Masuk: ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+                Text(
+                  "08:00",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  "Absen Pulang: ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+                Text(
+                  "17:00",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          )
+        ])
+      ]),
+    );
+  }
 
-    return DateFormat(pattern).format(dateTime);
+  String _format(String pattern) {
+    final format = DateFormat(pattern);
+    return format.format(DateTime.now());
   }
 
   _setTime() {
@@ -150,15 +205,16 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Padding _buildNameWidget() {
+  Widget _buildNameWidget() {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(children: [
-        const CircleAvatar(
-          backgroundColor: Colors.white,
-          child: Icon(Icons.person),
+        const Icon(
+          Icons.account_circle_rounded,
+          size: 90,
+          color: Colors.white,
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 14),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
             _email,
@@ -168,26 +224,20 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
+          const SizedBox(height: 4),
           const Text(
             "PT Bank Amar Indonesia",
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w300,
             ),
-          )
-        ])
+          ),
+        ]),
       ]),
     );
   }
 
-  _getData() {
-    final auth = FirebaseAuth.instance.currentUser;
-    setState(() {
-      _email = auth!.email!;
-    });
-  }
-
-  _logout() async {
+  logout() async {
     await FirebaseAuth.instance.signOut();
     Navigator.pushAndRemoveUntil(
       context,
@@ -196,5 +246,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       (route) => false,
     );
+  }
+
+  _getEmail() {
+    final auth = FirebaseAuth.instance.currentUser;
+    _email = auth!.email!;
   }
 }

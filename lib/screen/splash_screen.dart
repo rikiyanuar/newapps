@@ -1,13 +1,12 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:newapps/screen/login_screen.dart';
+import 'package:newapps/utils/app_constant.dart';
 
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({Key? key}) : super(key: key);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -16,65 +15,45 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    _login();
+    checkAuth();
     super.initState();
+  }
+
+  checkAuth() {
+    final auth = FirebaseAuth.instance.currentUser;
+    if (auth == null) {
+      Future.delayed(const Duration(seconds: 3)).then(
+        (value) => Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        ),
+      );
+    } else {
+      Future.delayed(const Duration(seconds: 3)).then(
+        (value) => Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.pink,
-      body: Center(
-        child: Column(children: const [
-          SizedBox(height: 250),
-          Icon(
-            Icons.feed,
-            size: 120,
-            color: Colors.white,
-          ),
-          SizedBox(height: 48),
-          Text(
-            "Welcome",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 12),
-          Text(
-            "Welcome to New Apps",
+      body: Container(
+        color: Colors.pink,
+        child: const Center(
+          child: Text(
+            AppConstant.titleApp,
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
-              fontWeight: FontWeight.w100,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 72),
-        ]),
+        ),
       ),
     );
-  }
-
-  _login() async {
-    final auth = FirebaseAuth.instance.currentUser;
-    await Future.delayed(const Duration(seconds: 3));
-    if (auth == null) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const LoginScreen(),
-        ),
-        (route) => false,
-      );
-    } else {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
-        (route) => false,
-      );
-    }
   }
 }
