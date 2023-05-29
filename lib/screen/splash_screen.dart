@@ -1,11 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:newapps/screen/login_screen.dart';
+import 'package:newapps/utils/app_constant.dart';
 
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({Key? key}) : super(key: key);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -13,71 +14,46 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.pink,
-      body: Center(
-        child: Column(children: [
-          const SizedBox(height: 150),
-          const Icon(
-            Icons.feed,
-            size: 120,
-            color: Colors.white,
-          ),
-          const SizedBox(height: 48),
-          const Text(
-            "Welcome",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            "Welcome to New Apps",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w100,
-            ),
-          ),
-          const SizedBox(height: 72),
-          ElevatedButton(
-            onPressed: () => _checkAuth(),
-            style: ButtonStyle(
-              backgroundColor: const MaterialStatePropertyAll(Colors.white),
-              foregroundColor: const MaterialStatePropertyAll(Colors.pink),
-              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
-                  side: const BorderSide(color: Colors.white),
-                ),
-              ),
-            ),
-            child: const Text("LET'S START"),
-          )
-        ]),
-      ),
-    );
+  void initState() {
+    checkAuth();
+    super.initState();
   }
 
-  _checkAuth() {
+  checkAuth() {
     final auth = FirebaseAuth.instance.currentUser;
     if (auth == null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const LoginScreen(),
+      Future.delayed(const Duration(seconds: 3)).then(
+        (value) => Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
         ),
       );
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
+      Future.delayed(const Duration(seconds: 3)).then(
+        (value) => Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         ),
       );
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        color: Colors.pink,
+        child: const Center(
+          child: Text(
+            AppConstant.titleApp,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
