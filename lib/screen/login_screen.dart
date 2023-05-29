@@ -2,7 +2,9 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:newapps/utils/app_constant.dart';
 
+import '../widgets/button.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
 
@@ -22,88 +24,83 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 50),
-            const Center(
-              child: Text(
-                "New Apps",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        padding: const EdgeInsets.all(24),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const SizedBox(height: 80),
+          const Center(
+            child: Text(
+              AppConstant.titleApp,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 48),
+          Text(
+            "Login to your Account",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade700,
+            ),
+          ),
+          _buildCard(
+            child: TextField(
+              controller: _emailInput,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                hintText: "Email",
               ),
             ),
-            const SizedBox(height: 24),
-            const Text(
-              "Login to your Account",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 32),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 12,
-                      spreadRadius: 1,
-                    )
-                  ]),
-              child: TextField(
-                controller: _emailInput,
-                decoration: const InputDecoration(
-                    border: InputBorder.none, hintText: "Email"),
+          ),
+          _buildCard(
+            child: TextField(
+              controller: _passwordInput,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                hintText: "Password",
               ),
+              obscureText: true,
             ),
-            Container(
-              margin: const EdgeInsets.only(top: 24),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 12,
-                      spreadRadius: 1,
-                    )
-                  ]),
-              child: TextField(
-                controller: _passwordInput,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Password",
+          ),
+          const SizedBox(height: 48),
+          GeneralButton(
+            text: "Sign In",
+            onTap: () => login(),
+          ),
+          const SizedBox(height: 32),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RegisterScreen(),
                 ),
-                obscureText: true,
-              ),
+              );
+            },
+            child: const Center(
+              child: Text("Don't have an Account? Sign Up"),
             ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => login(),
-                child: const Text("Sign In"),
-              ),
-            ),
-            const SizedBox(height: 48),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RegisterScreen(),
-                  ),
-                );
-              },
-              child: const Center(
-                child: Text("Don't have an Account? Sign Up"),
-              ),
-            )
-          ],
-        ),
+          )
+        ]),
       ),
+    );
+  }
+
+  Container _buildCard({required Widget child}) {
+    return Container(
+      margin: const EdgeInsets.only(top: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.07),
+            blurRadius: 14,
+            spreadRadius: 2,
+          )
+        ],
+      ),
+      child: child,
     );
   }
 
@@ -112,9 +109,10 @@ class _LoginScreenState extends State<LoginScreen> {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailInput.text, password: _passwordInput.text);
       Future.delayed(const Duration(seconds: 3)).then(
-        (value) => Navigator.pushReplacement(
+        (value) => Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (route) => false,
         ),
       );
     } on FirebaseAuthException catch (e) {

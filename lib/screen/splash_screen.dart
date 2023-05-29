@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:newapps/screen/login_screen.dart';
+import 'package:newapps/utils/app_constant.dart';
 
 import 'home_screen.dart';
 
@@ -44,8 +45,12 @@ class _SplashScreenState extends State<SplashScreen> {
         color: Colors.pink,
         child: const Center(
           child: Text(
-            "New Apps",
-            style: TextStyle(color: Colors.white),
+            AppConstant.titleApp,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),

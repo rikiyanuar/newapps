@@ -6,6 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../widgets/button.dart';
+import 'presensi_screen.dart';
+import 'riwayat_presensi_screen.dart';
 import 'splash_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,10 +29,14 @@ class _HomeScreenState extends State<HomeScreen> {
   String _email = "";
   String _time = "";
   final menuList = [
-    Menu(Icons.newspaper_rounded, "Berita"),
+    Menu(Icons.newspaper_outlined, "Berita"),
     Menu(Icons.monetization_on_rounded, "Gaji"),
-    Menu(Icons.desktop_mac_rounded, "Monitoring"),
+    Menu(Icons.people, "Monitoring"),
     Menu(Icons.track_changes, "Nilai"),
+    Menu(Icons.timer_sharp, "Presensi"),
+    Menu(Icons.bar_chart_outlined, "Statistik"),
+    Menu(Icons.person, "Profil"),
+    Menu(Icons.calendar_month, "Cuti"),
   ];
 
   @override
@@ -46,53 +53,79 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(children: [
         Container(
           color: Colors.pink,
-          height: 180,
+          height: 250,
           width: double.infinity,
         ),
         Column(children: [
           SizedBox(height: MediaQuery.of(context).padding.top + 12),
           _buildNameWidget(),
           _buildCardWidget(),
-          GridView.count(
-            crossAxisCount: 4,
-            shrinkWrap: true,
-            children: menuList
-                .map((menu) => _buildMenuWidget(menu.icon, menu.title))
-                .toList(),
+          MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: GridView.count(
+              crossAxisCount: 4,
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
+              children: menuList
+                  .map((menu) => _buildMenuWidget(menu.icon, menu.title))
+                  .toList(),
+            ),
+          ),
+          const Spacer(),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: GeneralButton(
+              text: "ABSEN MASUK",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PresensiScreen(mode: "Masuk"),
+                  ),
+                );
+              },
+            ),
           ),
         ])
       ]),
     );
   }
 
-  Column _buildMenuWidget(
+  Widget _buildMenuWidget(
     IconData icon,
     String title,
   ) {
-    return Column(children: [
-      Icon(
-        icon,
-        size: 32,
-        color: Colors.blue,
-      ),
-      const SizedBox(height: 10),
-      Text(
-        title,
-        style: const TextStyle(fontSize: 16),
-      ),
-    ]);
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        if (title == "Presensi") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RiwayatPresensiScreen(),
+            ),
+          );
+        }
+      },
+      child: Column(children: [
+        Icon(icon, size: 34, color: Colors.blue),
+        const SizedBox(height: 10),
+        Text(title),
+      ]),
+    );
   }
 
   Container _buildCardWidget() {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            spreadRadius: 6,
-            blurRadius: 4,
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 14,
+            spreadRadius: 4,
           )
         ],
       ),
@@ -101,14 +134,62 @@ class _HomeScreenState extends State<HomeScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       child: Column(children: [
         Text(_format("EEEE, dd MMM yyyy")),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         Text(
           _time,
           style: const TextStyle(
-            fontSize: 60,
-            fontWeight: FontWeight.w700,
+            fontSize: 48,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 2,
           ),
         ),
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  "Absen Masuk: ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+                Text(
+                  "08:00",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  "Absen Pulang: ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+                Text(
+                  "17:00",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          )
+        ])
       ]),
     );
   }
@@ -128,9 +209,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(children: [
-        const CircleAvatar(
-          backgroundColor: Colors.white,
-          child: Icon(Icons.person),
+        const Icon(
+          Icons.account_circle_rounded,
+          size: 90,
+          color: Colors.white,
         ),
         const SizedBox(width: 14),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -138,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _email,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: FontWeight.w600,
             ),
           ),
