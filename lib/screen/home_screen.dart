@@ -28,6 +28,7 @@ class Menu {
 class _HomeScreenState extends State<HomeScreen> {
   String _email = "";
   String _time = "";
+  Timer? _timer;
   final menuList = [
     Menu(Icons.newspaper_outlined, "Berita"),
     Menu(Icons.monetization_on_rounded, "Gaji"),
@@ -43,8 +44,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     _getEmail();
     _setTime();
-    Timer.periodic(const Duration(seconds: 1), (timer) => _setTime());
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _setTime());
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer!.cancel();
+    super.dispose();
   }
 
   @override

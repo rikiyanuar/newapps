@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class RiwayatPresensiScreen extends StatefulWidget {
@@ -8,19 +9,35 @@ class RiwayatPresensiScreen extends StatefulWidget {
 }
 
 class _RiwayatPresensiScreenState extends State<RiwayatPresensiScreen> {
+  final absensi = FirebaseFirestore.instance.collection("absensi");
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Riwayat Presensi"),
       ),
-      body: Column(children: [
-        _buildCardWidget(),
-      ]),
+      body: StreamBuilder(
+        stream: absensi.snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const CircularProgressIndicator();
+          }
+
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              final data = snapshot.data!.docs[index];
+
+              return _buildCardWidget(data);
+            },
+          );
+        },
+      ),
     );
   }
 
-  _buildCardWidget() {
+  _buildCardWidget(data) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -33,44 +50,45 @@ class _RiwayatPresensiScreenState extends State<RiwayatPresensiScreen> {
           )
         ],
       ),
-      child: Column(children: [
-        const Text(
-          "Monday, 29 May 2023",
-          style: TextStyle(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(
+          data['tanggal'],
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 6),
         Row(children: [
           Expanded(
-            child: Row(children: const [
-              Text(
-                "Masuk :",
+            child: Row(children: [
+              const Text(
+                "Masuk : ",
                 style: TextStyle(color: Colors.green),
               ),
-              SizedBox(width: 6),
-              Text("08:00:00"),
+              const SizedBox(width: 6),
+              Text(data['jamMasuk']),
             ]),
           ),
           const SizedBox(height: 6),
           Expanded(
-            child: Row(children: const [
-              Text(
-                "Keluar :",
+            child: Row(children: [
+              const Text(
+                "Keluar : ",
                 style: TextStyle(color: Colors.red),
               ),
-              SizedBox(width: 6),
-              Text("17:00:00"),
+              const SizedBox(width: 6),
+              Text(data['jamKeluar']),
             ]),
           ),
         ]),
-        Row(children: const [
-          Text(
-            "Lokasi :",
+        Row(children: [
+          const Text(
+            "Lokasi : ",
             style: TextStyle(color: Colors.red),
           ),
-          SizedBox(width: 6),
-          Text("112.76187163,-6.2352364"),
+          const SizedBox(width: 6),
+          Text(data['lokasi']),
         ]),
       ]),
     );
