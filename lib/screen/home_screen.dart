@@ -85,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: GeneralButton(
               text: "ABSEN MASUK",
               onTap: () {
+                // logout();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -257,6 +258,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _getEmail() {
     final auth = FirebaseAuth.instance.currentUser;
-    _email = auth!.email!;
+    _email = auth!.displayName!;
   }
 }

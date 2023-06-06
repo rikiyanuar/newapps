@@ -2,6 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:newapps/utils/app_constant.dart';
 
 import '../widgets/button.dart';
@@ -18,6 +19,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailInput = TextEditingController();
   final _passwordInput = TextEditingController();
+
+  final _googleSignIn = GoogleSignIn(
+    scopes: [
+      'email',
+      'https://www.googleapis.com/auth/contacts.readonly',
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +87,13 @@ class _LoginScreenState extends State<LoginScreen> {
             child: const Center(
               child: Text("Don't have an Account? Sign Up"),
             ),
-          )
+          ),
+          const SizedBox(height: 60),
+          GeneralButton(
+            text: "Sign In With Google",
+            onTap: () => signInWithGoogle(),
+            color: Colors.blue,
+          ),
         ]),
       ),
     );
@@ -102,6 +116,35 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       child: child,
     );
+  }
+
+  signInWithGoogle() async {
+    try {
+      final googleSignIn = await _googleSignIn.signIn();
+
+      final googleSignInAuthentication = await googleSignIn!.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      Future.delayed(const Duration(seconds: 3)).then(
+        (value) => Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (route) => false,
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+    }
   }
 
   login() async {
